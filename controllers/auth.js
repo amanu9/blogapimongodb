@@ -5,14 +5,28 @@ const { validationResult } = require("express-validator");
 const signup = async (req, res, next) => {
    
     try {
+      const { name, email, password, role } = req.body;
     
-        // 1. Validate input
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() });
+        // 1. Validate input at once this wiil handle all input for my validationrather than using the below can use this
+        // const errors = validationResult(req);
+        // if (!errors.isEmpty()) {
+        //     return res.status(400).json({ errors: errors.array() });
+        // }
+        
+        
+
+        if (!name) {
+            const error = new Error("Name is required");
+            error.statusCode = 400;
+            throw error;
         }
 
-        const { name, email, password, role } = req.body;
+        if (!email) {
+            const error = new Error("Email is required");
+            error.statusCode = 400;
+            throw error;
+        }
+
         
         // 2. Check if user already exists
         const existingUser = await User.findOne({ email });
@@ -58,7 +72,7 @@ const signup = async (req, res, next) => {
         // Pass other errors to error handling middleware
         next(error);
     }
-     throw new Error("aman eroro");
+    
 };
 
 module.exports = {
