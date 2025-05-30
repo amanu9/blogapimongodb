@@ -1,6 +1,6 @@
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
-const { validationResult } = require("express-validator");
+const { validationResult } = require("express-validator");// express validator package
 
 const signup = async (req, res, next) => {
    
@@ -15,18 +15,27 @@ const signup = async (req, res, next) => {
         
         
 
-        if (!name) {
-            const error = new Error("Name is required");
-            error.statusCode = 400;
-            throw error;
-        }
+//         if (!name) {
+//             const error = new Error("Name is required");
+//             error.statusCode = 400;// 400 means client side erorr
+//             throw error;
+//         }
 
-        if (!email) {
-            const error = new Error("Email is required");
-            error.statusCode = 400;
-            throw error;
-        }
-
+//         if (!email) {
+//             const error = new Error("Email is required");
+//             error.statusCode = 400;
+//             throw error;
+//         }
+//         if (!password) {
+//             const error = new Error("password is required");
+//             error.statusCode = 400;
+//             throw error;
+//         }
+//  if (password.length<6) {
+//             const error = new Error("password is too short");
+//             error.statusCode = 400;
+//             throw error;
+//         }
         
         // 2. Check if user already exists
         const existingUser = await User.findOne({ email });
@@ -75,6 +84,44 @@ const signup = async (req, res, next) => {
     
 };
 
+// signin controller
+const sinin = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+
+    // 1. Check if user exists
+    const user = await User.findOne({ email });
+    if (!user) {
+      const error = new Error("Invalid credentials");
+      error.statusCode = 401; // Unauthorized
+      throw error;
+    }
+
+    // 2. Verify password
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      const error = new Error("Invalid credentials");
+      error.statusCode = 401;
+      throw error;
+    }
+
+    // 3. Prepare user response (without password)
+    const userResponse = { ...user.toObject() };
+    delete userResponse.password;
+
+    // 4. Send success response
+    res.status(200).json({
+      success: true,
+      message: "Login successful",
+      user: userResponse
+    });
+
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
-    signup
+    signup,
+    sinin
 };
