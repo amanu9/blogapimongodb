@@ -1,7 +1,7 @@
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const { validationResult } = require("express-validator");// express validator package
-
+const generateToken=require("../utl/generateToken");// importing token
 const signup = async (req, res, next) => {
    
     try {
@@ -104,6 +104,7 @@ const sinin = async (req, res, next) => {
       error.statusCode = 401;
       throw error;
     }
+    const token=generateToken(user)
 
     // 3. Prepare user response (without password)
     const userResponse = { ...user.toObject() };
@@ -113,7 +114,8 @@ const sinin = async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: "Login successful",
-      user: userResponse
+      user: userResponse,
+      data:{token}
     });
 
   } catch (error) {
