@@ -3,6 +3,9 @@ const bcrypt = require("bcrypt");
 const { validationResult } = require("express-validator");// express validator package
 const generateToken=require("../utl/generateToken");// importing token
 const generateCode=require("../utl/generateCode");
+const sendemail=require("../utl/sendEmail");
+const sendEmail = require("../utl/sendEmail");
+
 const signup = async (req, res, next) => {
    
     try {
@@ -142,7 +145,13 @@ try{
 const code=generateCode(6);
 user.verificationCode=code;
 await user.save();
-res.status(200).json({code:200,status:true,message:"User verification send successfully"});
+await sendEmail({
+  emailTo:user.email,
+  subject:"Email verification code",
+  code,
+  content:"verify user account"
+
+})
 }catch(error){
   next(error)
 }

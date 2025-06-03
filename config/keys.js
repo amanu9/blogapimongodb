@@ -1,2 +1,2 @@
-const {PORT,CONNECTION_URL,JWT_SECRETE}=process.env
-module.exports={port:PORT,connection_url:CONNECTION_URL,jwtsecrete:JWT_SECRETE};
+const {PORT,CONNECTION_URL,JWT_SECRETE,SENDER_EMAIL,EMAIL_PASSWORD}=process.env
+module.exports={port:PORT,connection_url:CONNECTION_URL,jwtsecrete:JWT_SECRETE,senderemail:SENDER_EMAIL,emailPassword:EMAIL_PASSWORD};
