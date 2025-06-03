@@ -12,4 +12,10 @@ const signinValidator=[
     check("password").notEmpty().withMessage("password is required")
 ]
 
-module.exports={signUpvalidator,signinValidator}
+// emailvalidator
+const emailvalidator=[
+    check("email").isEmail().withMessage("Invalid Email").notEmpty().withMessage("email is required")
+
+]
+
+module.exports={signUpvalidator,signinValidator,emailvalidator}

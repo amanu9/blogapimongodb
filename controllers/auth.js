@@ -2,6 +2,7 @@ const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const { validationResult } = require("express-validator");// express validator package
 const generateToken=require("../utl/generateToken");// importing token
+const generateCode=require("../utl/generateCode");
 const signup = async (req, res, next) => {
    
     try {
@@ -123,7 +124,32 @@ const sinin = async (req, res, next) => {
   }
 };
 
+// send email verification code controller
+
+const verifycode= async(req,res,next)=>{
+try{
+  const {email}=req.body;
+    const user = await User.findOne({ email });
+    if(!user){
+      res.status=404;
+      throw new Error("User not found");
+    }
+    if(user.isVerified){
+      res.status=404;
+      throw new Error("user already verified");
+    }
+
+const code=generateCode(6);
+user.verificationCode=code;
+await user.save();
+res.status(200).json({code:200,status:true,message:"User verification send successfully"});
+}catch(error){
+  next(error)
+}
+}
+
 module.exports = {
     signup,
-    sinin
+    sinin,
+    verifycode
 };
