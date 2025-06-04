@@ -3,7 +3,6 @@ const bcrypt = require("bcrypt");
 const { validationResult } = require("express-validator");// express validator package
 const generateToken=require("../utl/generateToken");// importing token
 const generateCode=require("../utl/generateCode");
-const sendemail=require("../utl/sendEmail");
 const sendEmail = require("../utl/sendEmail");
 
 const signup = async (req, res, next) => {
@@ -188,7 +187,7 @@ const verifyUser=async(req,res,next)=>{
         message: "Invalid code" 
       });
     }
-    user.isVerified=true;
+    user.isVerified=true;// change the false status to true
     user.verificationCode=null// no needed the code again it reset the code to null because we dont need now since we verfied
     await user.save();
     res.status(200).json({ 
@@ -204,10 +203,52 @@ const verifyUser=async(req,res,next)=>{
   }
 }
 
+// forgot password
+
+const forgotPasswordCode=async(req,res,next)=>{
+  try{
+
+    const {email}=req.body;
+    const user= await User.findOne({email})
+
+    if (!user) {
+      return res.status(404).json({ 
+        success: false, 
+        message: "User not found" 
+      });
+    }
+  
+  const code=generateCode(6)// generating 6 digit code
+  user.forgotPasswordCodeUser=code// compar
+  user.save();// save to db
+
+  // then caal send email function
+
+  await sendEmail({
+    emailTo:user.email,
+    code, 
+    content:"Change your password",
+    subject:"Password Reset"
+  });
+  
+    res.status(200).json({ 
+        success: true, 
+        message: "Password reset code sent successfully" 
+      });
+    }
+
+  
+  catch(error){
+    next(error)
+
+  }
+}
+
 
 module.exports = {
     signup,
     sinin,
     verifycode,
-    verifyUser
+    verifyUser,
+    forgotPasswordCode
 };
