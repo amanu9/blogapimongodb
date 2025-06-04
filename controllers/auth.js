@@ -168,9 +168,46 @@ const verifycode = async (req, res, next) => {
   }
 };
 
+// verify user
+
+const verifyUser=async(req,res,next)=>{
+  try{
+
+    const {email,code}=req.body;
+    const user= await User.findOne({email})
+
+    if (!user) {
+      return res.status(404).json({ 
+        success: false, 
+        message: "User not found" 
+      });
+    }
+    if (user.verificationCode!==code) {
+      return res.status(404).json({ 
+        success: false, 
+        message: "Invalid code" 
+      });
+    }
+    user.isVerified=true;
+    user.verificationCode=null// no needed the code again it reset the code to null because we dont need now since we verfied
+    await user.save();
+    res.status(200).json({ 
+        success: true, 
+        message: "user verified successfully" 
+      });
+    }
+
+  
+  catch(error){
+    next(error)
+
+  }
+}
+
 
 module.exports = {
     signup,
     sinin,
-    verifycode
+    verifycode,
+    verifyUser
 };

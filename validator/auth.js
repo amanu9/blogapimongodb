@@ -18,4 +18,11 @@ const emailvalidator=[
 
 ]
 
-module.exports={signUpvalidator,signinValidator,emailvalidator}
+// validator for user
+const verifyUserValidator=[
+    check("email").isEmail().withMessage("Invalid email").notEmpty().withMessage("Email is required"),
+    check("code").notEmpty().withMessage("code is required")
+]
+
+
+module.exports={signUpvalidator,signinValidator,emailvalidator,verifyUserValidator}
