@@ -227,7 +227,7 @@ const forgotPasswordCode=async(req,res,next)=>{
   await sendEmail({
     emailTo:user.email,
     code, 
-    content:"Change your password",
+    content:"use below code to change your password",
     subject:"Password Reset"
   });
   
@@ -245,10 +245,51 @@ const forgotPasswordCode=async(req,res,next)=>{
 }
 
 
+// recover password
+
+const recoverPassword=async(req,res,next)=>{
+  try{
+    const {email,code,password}=req.body;
+
+ const user= await User.findOne({email})
+
+ // check user first by email 
+    if (!user) {
+      return res.status(404).json({ 
+        success: false, 
+        message: "User not found" 
+      });
+    }
+     if (user.forgotPasswordCodeUser!==code) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Invalid code" 
+      });
+    }
+      // 3. Hash password
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+        user.password=hashedPassword;
+        user.forgotPasswordCodeUser=null;
+        user.save();
+        res.status(200).json({ 
+        success: true, 
+        message: "Password reset  successfully" ,
+      });
+    }
+  
+
+  catch(erorr){
+    next(erorr)
+  }
+}
+
+// exporting all module
 module.exports = {
     signup,
     sinin,
     verifycode,
     verifyUser,
-    forgotPasswordCode
+    forgotPasswordCode,
+    recoverPassword
 };

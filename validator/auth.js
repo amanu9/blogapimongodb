@@ -24,5 +24,13 @@ const verifyUserValidator=[
     check("code").notEmpty().withMessage("code is required")
 ]
 
+// validator for user
+const resetPasswordValidator=[
+    check("email").isEmail().withMessage("Invalid email").notEmpty().withMessage("Email is required"),
+    check("code").notEmpty().withMessage("code is required"),
+   check("password").isLength({min:6}).withMessage("password is too short").notEmpty().withMessage("password is required"),
+]
 
-module.exports={signUpvalidator,signinValidator,emailvalidator,verifyUserValidator}
+
+
+module.exports={signUpvalidator,signinValidator,emailvalidator,verifyUserValidator,resetPasswordValidator}
