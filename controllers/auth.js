@@ -128,34 +128,46 @@ const sinin = async (req, res, next) => {
 };
 
 // send email verification code controller
-
-const verifycode= async(req,res,next)=>{
-try{
-  const {email}=req.body;
+const verifycode = async (req, res, next) => {
+  try {
+    const { email } = req.body;
     const user = await User.findOne({ email });
-    if(!user){
-      res.status=404;
-      throw new Error("User not found");
+    
+    if (!user) {
+      return res.status(404).json({ 
+        success: false, 
+        message: "User not found" 
+      });
     }
-    if(user.isVerified){
-      res.status=404;
-      throw new Error("user already verified");
+    
+    if (user.isVerified) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "User already verified" 
+      });
     }
 
-const code=generateCode(6);
-user.verificationCode=code;
-await user.save();
-await sendEmail({
-  emailTo:user.email,
-  subject:"Email verification code",
-  code,
-  content:"verify user account"
+    const code = generateCode(6);
+    user.verificationCode = code;
+    await user.save();
+    
+    await sendEmail({
+      emailTo: user.email,
+      subject: "Email verification code",
+      code,
+      content: "Verify your account"
+    });
 
-})
-}catch(error){
-  next(error)
-}
-}
+    res.status(200).json({ 
+      success: true, 
+      message: "Verification code sent successfully" 
+    });
+
+  } catch (error) {
+    next(error);
+  }
+};
+
 
 module.exports = {
     signup,
