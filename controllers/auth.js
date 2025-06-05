@@ -111,7 +111,7 @@ const sinin = async (req, res, next) => {
 
     // 3. Prepare user response (without password)
     const userResponse = { ...user.toObject() };
-    delete userResponse.password;
+    delete userResponse.password;// removing password from response for security purpose
 
     // 4. Send success response
     res.status(200).json({
@@ -283,6 +283,46 @@ const recoverPassword=async(req,res,next)=>{
     next(erorr)
   }
 }
+//password reset with user token 
+// Change password (requires valid JWT)
+const changePassword = async (req, res, next) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const userId = req.user._id; // From JWT middleware
+
+    // 1. Find user
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
+
+    // 2. Verify current password against stored hash
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return res.status(401).json({
+        success: false,
+        message: "Current password is incorrect"
+      });
+    }
+
+    // 3. Hash and save new password
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(newPassword, salt);
+    await user.save();
+
+    // 4. Respond with success
+    res.status(200).json({
+      success: true,
+      message: "Password updated successfully"
+    });
+
+  } catch (error) {
+    next(error);
+  }
+};
 
 // exporting all module
 module.exports = {
@@ -291,5 +331,6 @@ module.exports = {
     verifycode,
     verifyUser,
     forgotPasswordCode,
-    recoverPassword
+    recoverPassword,
+    changePassword
 };

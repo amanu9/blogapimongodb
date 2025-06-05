@@ -31,6 +31,13 @@ const resetPasswordValidator=[
    check("password").isLength({min:6}).withMessage("password is too short").notEmpty().withMessage("password is required"),
 ]
 
+const changePasswordValidator = [
+  check("currentPassword").notEmpty().withMessage("Current password is required"),
+  check("newPassword")
+    .isLength({ min: 6 })
+    .withMessage("Password must be at least 6 characters")
+    .notEmpty()
+    .withMessage("New password is required")
+];
 
-
-module.exports={signUpvalidator,signinValidator,emailvalidator,verifyUserValidator,resetPasswordValidator}
+module.exports={signUpvalidator,signinValidator,emailvalidator,verifyUserValidator,resetPasswordValidator,changePasswordValidator}

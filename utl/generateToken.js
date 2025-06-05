@@ -1,11 +1,15 @@
 const jwt=require("jsonwebtoken");
-const {jwtsecrete}=require("../config/keys")
+const {jwtSecret}=require("../config/keys")
 
 const generateToken=(user)=>{
 const token =jwt.sign({
-    _id:user._id,name:user.name,email:user.email,role:user.role
+    _id:user._id,
+    name:user.name,
+    email:user.email,
+    role:user.role
 
-},jwtsecrete)
+},jwtSecret
+)
 
 {
     expiresIn="7d"

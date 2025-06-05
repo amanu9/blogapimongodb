@@ -1,2 +1,4 @@
 const errorHandler=require("./errorhandler");
-module.exports={errorHandler}
+
+const authenticate = require("./isAuthenticated"); 
+module.exports = { errorHandler, authenticate } // Now exported as 'authenticate'// exporting the middle ware here

@@ -12,4 +12,6 @@ const UserSchema = mongoose.Schema({
     forgotPasswordCodeUser:String// for password reset
 }, { timestamps: true });
 
+
+
 module.exports = mongoose.model("User", UserSchema); // Direct export
