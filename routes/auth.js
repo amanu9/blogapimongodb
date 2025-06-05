@@ -3,7 +3,7 @@
 const express = require("express");
 const router = express.Router();
 const { authenticate } = require("../middleware"); // Import from middleware for autheticate user for password reset based on token
-const { signup,sinin,verifycode,verifyUser,forgotPasswordCode,recoverPassword,changePassword} = require("../controllers/auth"); // Directly import signup
+const { signup,sinin,verifycode,verifyUser,forgotPasswordCode,recoverPassword,changePassword,updateProfile} = require("../controllers/auth"); // Directly import signup
 const {signUpvalidator,signinValidator,emailvalidator,verifyUserValidator,resetPasswordValidator,changePasswordValidator}=require("../validator/auth");// validation calling
 const validate=require("../validator/validate");
 
@@ -16,6 +16,7 @@ router.post("/verify-user",verifyUserValidator,validate,verifyUser);// verfiying
 router.post("/forgot-password-code",emailvalidator,validate,forgotPasswordCode);// forgot password routes
 router.post("/reset-password",resetPasswordValidator,validate,recoverPassword);// password reset without token if we need that logic
 router.put("/change-password", authenticate, changePasswordValidator, validate, changePassword);// password reset with token
+router.put("/update-profile", authenticate,validate, updateProfile);// profile update
 
 module.exports = router;
 

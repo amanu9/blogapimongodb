@@ -1,4 +1,5 @@
-const {check}=require("express-validator");
+const {check}=require("express-validator");// link js express validator here and store in variable check
+const validateEmail=require("./validateemail");// importing email validator
 // sign up validator
 const signUpvalidator=[
     check("name").notEmpty().withMessage("name required"),
@@ -40,4 +41,23 @@ const changePasswordValidator = [
     .withMessage("New password is required")
 ];
 
-module.exports={signUpvalidator,signinValidator,emailvalidator,verifyUserValidator,resetPasswordValidator,changePasswordValidator}
+const updateprofileValidator = [
+  check("email").custom(async(email)=>{
+    if(email){
+
+        const isValidEmail=validateEmail(email);
+
+        if(!isValidEmail){
+            throw "Invalid Email"
+        }
+
+    }
+  }),
+  check("newPassword")
+    .isLength({ min: 6 })
+    .withMessage("Password must be at least 6 characters")
+    .notEmpty()
+    .withMessage("New password is required")
+];
+
+module.exports={signUpvalidator,signinValidator,emailvalidator,verifyUserValidator,resetPasswordValidator,changePasswordValidator,updateprofileValidator}

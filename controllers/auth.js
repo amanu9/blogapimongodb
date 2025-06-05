@@ -324,6 +324,45 @@ const changePassword = async (req, res, next) => {
   }
 };
 
+const updateProfile = async (req, res, next) => {
+  try {
+    const { _id } = req.user;
+    const { email, name } = req.body;
+
+    // ✅ Fix: Add await to get the user document
+    const user = await User.findById(_id).exec();
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // Update fields if provided
+    if (name) user.name = name;
+    if (email) {
+      user.email = email;
+      user.isVerified = false; // Mark as unverified if email changes
+    }
+
+    
+    await user.save();
+
+    // Remove password before sending response
+    const userResponse = user.toObject();
+    delete userResponse.password;
+
+    res.status(200).json({
+      success: true,
+      message: "Profile updated successfully",
+      data: { user: userResponse },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // exporting all module
 module.exports = {
     signup,
@@ -332,5 +371,7 @@ module.exports = {
     verifyUser,
     forgotPasswordCode,
     recoverPassword,
+    updateProfile,
     changePassword
+    
 };
