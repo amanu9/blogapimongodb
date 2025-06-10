@@ -46,50 +46,49 @@ const addCategory = async (req, res, next) => {
 };
 // update category controller 
 
-const updateCategory=async(req,res,next)=>{
-    try{
-const {id}=req.params;
-const {_id}=req.user;
-const {title,desc}=req.body;
+const updateCategory = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const { _id } = req.user;
+        const { title, desc } = req.body;
 
-const category =await Category.findById(id)
+        // Find the category to update
+        const category = await Category.findById(id);
 
-if(!category){
-    res.code=404;
-    throw new Error("resource not found");
-}
+        if (!category) {
+            res.code = 404;
+            throw new Error("Resource not found");
+        }
 
-const iscategoryExist=await Category.findOne({title});
-if(iscategoryExist){
-     
-            return res.status(400).json({ 
-                error: "category already exist " 
-            });
+        // Check if another category with the same title already exists
+        const isCategoryExist = await Category.findOne({ 
+            title, 
+            
+        });
         
-
-}
-
-const user=User.findById(_id)// getting user
-//checking user
-if(!user){
-     
+        if (isCategoryExist) {
             return res.status(400).json({ 
-                error: "user not found" 
+                error: "Category with this title already exists" 
             });
+        }
+
+       
+
+        // Update the category
+        category.title = title || category.title;
+        category.desc = desc || category.desc;
+        category.updatedBy = _id;
         
+        await category.save();
 
-}
-const newCategory=new Category({title,desc,updatedBy:_id})
-await newCategory.save();
-
-// sending response
- res.status(201).json({ 
+        // Send response
+        res.status(200).json({ 
             success: true,
-            message: "category created successfully",
-            data: newCategory// return addedd category in response 
+            message: "Category updated successfully",
+            data: category
         });
     }
-    catch(error){
+    catch (error) {
         next(error);
     }
 }
