@@ -93,6 +93,7 @@ const updateCategory = async (req, res, next) => {
         next(error);
     }
 }
+// delete category
 
 const deleteCategory=async(req,res,next)=>{
 try{
@@ -117,4 +118,36 @@ catch(error){
 }
 
 }
-module.exports={addCategory,updateCategory,deleteCategory};
+
+const getCategory=async(req,res,next)=>{
+try{
+  
+//const category=await Category.find({});//get all category
+const {q}=req.query
+let query={};
+if(q){
+  const search  =RegExp(q,"i")// i for insensative search with capital or samll 
+  query={$or:[{title:search},{desc:search}]}// to search with title and descriptiion
+}
+const category=await Category.find(query);
+
+
+  if (!category) {
+            return res.status(400).json({ 
+                error: "Category not exists" 
+            });
+        }
+        res.status(200).json({
+            success:true,
+            message:"all category list success",
+            data:{category}
+
+        })
+}
+
+catch(error){
+    next(error)
+}
+
+}
+module.exports={addCategory,updateCategory,deleteCategory,getCategory};
