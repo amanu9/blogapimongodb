@@ -8,7 +8,7 @@ const notfound=require("./controllers/notfound");// importing not found controll
 dotenv.config();// set enviroment put it at the top  before your connection
 
 const connectMongodb=require("./init/mongodbconnection");
-const {authRoute,categoryRooute}=require("./routes")// all route inport here
+const {authRoute,categoryRooute,fileroutes}=require("./routes")// all route inport here
 const {errorHandler}=require("./middleware");
 
 
@@ -24,9 +24,13 @@ app.use(morgan("dev"));// morgan is third party module third part that help us t
 
 // routes section
 
-
+// auth routes
 app.use("/api/auth", authRoute);// using the route
-app.use("/api/category",categoryRooute);// using the route
+// category routes
+app.use("/api/category",categoryRooute);// using the category route
+
+// files routes 
+app.use("/api/files",fileroutes);// using the  file route
 
 
 // middle ware error handler
