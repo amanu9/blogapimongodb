@@ -185,4 +185,26 @@ const getCategories = async (req, res, next) => {
     next(error);
   }
 };
-module.exports={addCategory,updateCategory,deleteCategory,getCategory,getCategories};
+// getting unique category 
+const getCategoryDetail=async(req,res,next)=>{
+    try{
+        const {id}=req.params;
+        const category=await Category.findById(id)
+        if(!category){
+            return res.status(400).json({ 
+                error: "Category not exists" 
+            }); 
+        }
+        res.status(200).json({
+            success:true,
+            message:"catagory get successfully",
+            data:{category}
+        })
+
+    }
+    catch(error){
+        next(error)
+    }
+
+}
+module.exports={addCategory,updateCategory,deleteCategory,getCategory,getCategories,getCategoryDetail};

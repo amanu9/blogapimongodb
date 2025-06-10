@@ -1,6 +1,6 @@
 const express=require("express");
 const router=express.Router();
-const {addCategory,updateCategory,deleteCategory,getCategory,getCategories}=require("../controllers/category")// call the exct name of the controller to avoid import error
+const {addCategory,updateCategory,deleteCategory,getCategory,getCategories,getCategoryDetail}=require("../controllers/category")// call the exct name of the controller to avoid import error
  const {addcategoryValidator,idValidator}=require("../validator/category");
 const validate=require("../validator/validate");
 const { authenticate } = require("../middleware"); // to make it protected route using middleware
@@ -13,5 +13,7 @@ router.put("/update/:id", authenticate, isAdmin,idValidator,validate, updateCate
 router.delete("/:id", authenticate, isAdmin,idValidator,validate, deleteCategory);
 router.get("/", authenticate, getCategory);
 router.get("/getbypageination", authenticate, getCategories);
+router.get("/:id", authenticate,idValidator,validate,  getCategoryDetail);//getting unique category
+
 
 module.exports=router;// exporting the route
