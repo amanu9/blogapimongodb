@@ -10,7 +10,7 @@ const addcategoryValidator = [
 const idValidator = [
     param("id").custom(async (id) => {
         if (id && !mongoose.Types.ObjectId.isValid(id)) {
-            throw new Error("Invalid category ");
+            throw new Error("Invalid category id");
         }
         return true;
     })

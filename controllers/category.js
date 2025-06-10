@@ -1,6 +1,7 @@
 
 const Category = require("../models/Category");
 const User = require("../models/User");
+const { param } = require("../routes/category");
 
 const addCategory = async (req, res, next) => {
     try {
@@ -92,4 +93,28 @@ const updateCategory = async (req, res, next) => {
         next(error);
     }
 }
-module.exports={addCategory,updateCategory};
+
+const deleteCategory=async(req,res,next)=>{
+try{
+    const {id}=req.params
+const category=await Category.findById(id);
+
+  if (!category) {
+            return res.status(400).json({ 
+                error: "Category not exists" 
+            });
+        }
+        await Category.findByIdAndDelete(id);
+        res.status(200).json({
+            success:true,
+            message:"category deleted successfully"
+
+        })
+}
+
+catch(error){
+    next(error)
+}
+
+}
+module.exports={addCategory,updateCategory,deleteCategory};
