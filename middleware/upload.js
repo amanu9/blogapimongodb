@@ -1,28 +1,25 @@
 const multer = require("multer");
 const path = require("path");
+const File = require("../models/File"); // Make sure you have this model import
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, "./uploads");  // Files will be saved in 'uploads' directory
+        cb(null, "./uploads");
     },
     filename: (req, file, cb) => {
         try {
             const originalName = file.originalname;
-            const extension = path.extname(originalName);  // Get file extension (.jpg, .png etc)
-            const baseName = path.basename(originalName, extension);  // Get filename without extension
+            const extension = path.extname(originalName);
+            const baseName = path.basename(originalName, extension);
             
-            // Process filename:
-            // 1. Replace spaces with underscores
-            // 2. Convert to lowercase
-            // 3. Add timestamp to prevent duplicates
             const processedName = baseName.replace(/\s+/g, '_')
-                                        .toLowerCase()  // Fixed typo: toLocalLowerCase → toLowerCase
+                                        .toLowerCase()
                                         + '_' + Date.now() 
                                         + extension;
 
-            cb(null, processedName);  // Final filename format: original_name_1234567890.jpg
+            cb(null, processedName);
         } catch (err) {
-            cb(err);  // Handle any errors in filename processing
+            cb(err);
         }
     }
 });
@@ -32,18 +29,45 @@ const fileFilter = (req, file, cb) => {
     const ext = path.extname(file.originalname).toLowerCase();
     
     if (allowedTypes.includes(ext)) {
-        cb(null, true);  // Accept the file
+        cb(null, true);
     } else {
         cb(new Error(`Unsupported file type. Only ${allowedTypes.join(', ')} are allowed.`), false);
     }
 };
 
-const amanupload = multer({
+const upload = multer({
     storage: storage,
     fileFilter: fileFilter,
     limits: {
-        fileSize: 5 * 1024 * 1024  // Limit file size to 5MB
+        fileSize: 5 * 1024 * 1024
     }
 });
 
-module.exports = amanupload;
+// Middleware to save file info to database
+const saveToDb = async (req, res, next) => {
+    if (!req.file) {
+        return next();
+    }
+
+    try {
+        const file = new File({
+            filename: req.file.filename,
+            originalName: req.file.originalname,
+            path: req.file.path,
+            size: req.file.size,
+            mimetype: req.file.mimetype,
+            createdBy: req.user._id // Using the authenticated user
+        });
+
+        await file.save();
+        req.file._id = file._id; // Attach MongoDB ID to the file object
+        next();
+    } catch (err) {
+        next(err);
+    }
+};
+
+module.exports = {
+    upload,
+    saveToDb
+};
